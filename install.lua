@@ -13,6 +13,5 @@ programs = {
 
 for _, program in ipairs(programs) do
     shell.run("delete", program)
-    assert(not fs.exists(program))
     shell.run("wget", string.format(ghstr, program, program))
 end

@@ -3,12 +3,17 @@ args = { ... }
 -- Syntax: mine [from level] [to level] [size|xsize zsize]
 -- Must have appropriate ender chest in slot 16
 
-if not api then shell.run("api") end
+if not api then shell.run("api.lua") end
 
 lx = 0
 lz = 0
 ldirX = 1
 ldirZ = 0
+
+if y == 0 then
+  write("GPS not available. Please enter current y: ")
+  y = tonumber(io.read())
+end
 startY = y
 
 topLevel = tonumber(args[1])
@@ -41,6 +46,12 @@ while getFuelLevel() < fuelNeeded do
   if not refuel() then exit() end
   dp("Fuel level: %d of %d", getFuelLevel(), fuelNeeded)
 end
+
+-- Create new startup
+shell.run("copy", "mine_startup startup")
+file = fs.open("_mine_info", "w")
+file.write(startY .. " " .. y)
+file.close()
 
 function deposit()
   if enderChest then
@@ -167,6 +178,12 @@ end
 function _mineLevel(xSize, zSize)
   dp("Mining level...")
   moveDown(1, 1)
+
+  -- Update startup stuff
+  file = fs.open("_mine_info", "w")
+  file.write(startY .. " " .. y)
+  file.close()
+
   lmoveToX(xSize-1, 1)
   while lx > 1 do
     lmoveToZ(zSize-1, 1)
@@ -183,6 +200,9 @@ function _mineLevel(xSize, zSize)
 end
 
 mine(xSize, zSize, topLevel, botLevel)
+
+shell.run("rm", "_mine_info")
+shell.run("rm", "startup")
 
 function dig() turtle.dig() end
 function digDown() turtle.digDown() end

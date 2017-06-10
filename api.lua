@@ -8,6 +8,12 @@
 -- "west"  or 2
 -- "north" or 3
 
+if api == true then
+  do return end
+else
+  api = true
+end
+
 -- DEBUG PRINT
 function dp(...)
   if debug then
@@ -359,7 +365,7 @@ function sortInv(first, last)
   dp("Sorting inventory...")
   for i=first+1, last do
     turtle.select(i)
-    for j=first, i do
+    for j=first, i-1 do
       if turtle.compareTo(j) then
         turtle.transferTo(j)
       end
@@ -456,6 +462,3 @@ function isChest(name)
   end
 end
 --]]
-
-
-api = true

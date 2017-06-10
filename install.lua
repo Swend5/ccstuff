@@ -1,19 +1,17 @@
-shell.run("delete", "mine")
-shell.run("delete", "api")
-shell.run("delete", "refuel")
-shell.run("delete", "pmine")
-shell.run("delete", "vgps")
-shell.run("delete", "build")
-shell.run("delete", "setupgps")
-shell.run("delete", "lumberjack")
-shell.run("delete", "queen")
+ghstr = "https://raw.githubusercontent.com/Swend5/ccstuff/master/%s.lua %s"
+programs = {
+    "mine"
+    "api"
+    "refuel"
+    "pmine"
+    "vgps"
+    "build"
+    "setupgps"
+    "lumberjack"
+    "queen"
+}
 
-shell.run("pastebin", "get 9SgkNu1H mine")
-shell.run("pastebin", "get 339ttUqQ api")
-shell.run("pastebin", "get ziCABmwP refuel")
-shell.run("pastebin", "get FcKXgSkF pmine")
-shell.run("pastebin", "get zQ8vTmwH vgps")
-shell.run("pastebin", "get EYUS0msD build")
-shell.run("pastebin", "get xnMCtb3a setupgps")
-shell.run("pastebin", "get 2iXaXXtc lumberjack")
-shell.run("pastebin", "get XHv4vd94 queen")
+for program in programs do
+    shell.run("delete", program)
+    shell.run("wget", string.format(ghstr, program, program))
+end

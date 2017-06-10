@@ -82,23 +82,23 @@ function _regularDeposit()
   offset = 0
 
   if ldirX == -1 or ldirZ == -1 and not lz == 1 then
-    lmoveToX(lx+1)
+    lmoveToX(lx+1, 1)
     offset = 1
   end
 
-  lmoveToZ(0)
-  lmoveToX(0)
-  moveToY(startY)
+  lmoveToZ(0, 1)
+  lmoveToX(0, 1)
+  moveToY(startY, 1)
   lfaceW()
   for i = 1, 16 do
     select(i)
     drop()
   end
   alreadyDiscarded = false
-  moveToY(oldY)
-  lmoveToX(oldX+offset)
-  lmoveToZ(oldZ)
-  lmoveToX(lx-offset)
+  moveToY(oldY, 1)
+  lmoveToX(oldX+offset, 1)
+  lmoveToZ(oldZ, 1)
+  lmoveToX(lx-offset, 1)
 end
 
 

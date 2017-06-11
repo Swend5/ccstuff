@@ -3,7 +3,7 @@ args = { ... }
 -- Syntax: mine [from level] [to level] [size|xsize zsize]
 -- Must have appropriate ender chest in slot 16
 
-if not api then shell.run("api.lua") end
+if not api then shell.run("api") end
 
 lx = 0
 lz = 0

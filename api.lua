@@ -37,8 +37,10 @@ shell.run("rom/apis/rednet")
 -------------------------------------------------------------------------------
  
 apiargs = {...}
-dp("API: called with arg: %s", apiargs[1])
- 
+if #apiargs > 0 then
+  dp("API: called with arg: %s", apiargs[1])
+end
+
 x, z, y = gps.locate(5)
 dp("API: gps located %d %d %d", x, z, y)
 if not x then x, z, y = 0, 0, 0 end
@@ -115,7 +117,7 @@ end
 function moveDown(n, d)
   d = d or 0
   moves = 0
-  dp("Moving down %d time(s)")
+  dp("Moving down %d time(s)", d)
   while moves < n do
     if d == 1 and detectDown() then
       digDown()

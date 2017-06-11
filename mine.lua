@@ -81,7 +81,7 @@ function _regularDeposit()
   oldY = y
   offset = 0
 
-  if ldirX == -1 or ldirZ == -1 and not lz == 1 then
+  if ldirX == -1 or (ldirZ == -1 and not lz == 1) then
     lmoveToX(lx+1, 1)
     offset = 1
   end

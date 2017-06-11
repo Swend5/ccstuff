@@ -368,6 +368,8 @@ end
  
 function sortInv(first, last)
   dp("Sorting inventory...")
+  first = first or 1
+  last = last or 16
   for i=first+1, last do
     turtle.select(i)
     for j=first, i-1 do
@@ -380,6 +382,8 @@ end
  
 function isInventoryFull(first, last)
   dp("Checking for full inventory")
+  first = first or 1
+  last = last or 16
   local load = 0
   for i=first, last do
     if getItemCount(i) > 0 then

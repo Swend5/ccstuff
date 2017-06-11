@@ -42,7 +42,10 @@ if #apiargs > 0 then
 end
 
 x, z, y = gps.locate(5)
-dp("API: gps located %d %d %d", x, z, y)
+if x then
+  dp("API: gps located %d %d %d", x, z, y)
+end
+
 if not x then x, z, y = 0, 0, 0 end
 dirX, dirZ = 1, 0
  

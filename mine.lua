@@ -1,57 +1,96 @@
 args = { ... }
 
--- Syntax: mine [from level] [to level] [size|xsize zsize]
--- Appropriate ender chest in slot 16
+-- Syntax: mine [current y] [from level] [to level] [size|xsize zsize]
+-- Appropriate ender chest in slot 16, if relevant
 
-if not api then shell.run("api") end
-
-lx = 0
-lz = 0
-ldirX = 1
-ldirZ = 0
-
-if y == 0 then
-  write("GPS not available. Please enter current y: ")
-  y = tonumber(io.read())
+if fs.exists("api.lua") then
+  shell.run("api.lua")
+else
+  shell.run("api")
 end
-startY = y
+  
 
-topLevel = tonumber(args[1])
-botLevel = tonumber(args[2])
+startupString = [[
+if not fs.exists("_mine_info") then
+  print("Tried to recover, but couldn't access _mine_info.")
+  do return end
+end
 
-if #args == 3 then
-  xSize = tonumber(args[3])
-  zSize = tonumber(args[3])
-elseif #args == 4 then
-  xSize = tonumber(args[3])
+shell.run("api.lua")
+
+file = fs.open("_mine_info", "r")
+params = split(file.readAll(), " ")
+file.close()
+startY = tonumber(params[1])
+y = tonumber(params[2])
+
+moveToY(startY, 1)
+while detectUp() do
+  digUp()
+  moveToY(y+1)
+end
+
+shell.run("rm", "_mine_info")
+shell.run("rm", "startup")
+
+print("Ready after disrupted mining.")
+]]
+
+discardNames = {
+  "dirt",
+  "sand",
+  "cobblestone",
+  "gravel",
+}
+
+startY = tonumber(args[1])
+topLevel = tonumber(args[2])
+botLevel = tonumber(args[3])
+
+if #args == 4 then
+  xSize = tonumber(args[4])
   zSize = tonumber(args[4])
+elseif #args == 5 then
+  xSize = tonumber(args[4])
+  zSize = tonumber(args[5])
+else
+  print("Usage: mine [current y] [from level] [to level] [size|xsize zsize]")
+  do return end
 end
 
 enderChest = getItemName(16) == "enderChest"
 if enderChest then
+  dp("Enderchest found")
   max = 15
 else
   max = 16
 end
 
 -- Print information
-dp("Mining %d levels from %d to %d in a %dx%d area", topLevel-botLevel+1, topLevel, botLevel, xSize, zSize)
+print(sf("Mining %d levels from %d to %d in a %dx%d area", topLevel-botLevel+1, topLevel, botLevel, xSize, zSize))
 
 -- Calculate fuel approximate fuel needed, ask for a refuel if fuel is too low
 fuelNeeded = (topLevel - botLevel + 1) * xSize * zSize * 1.1
 dp("Fuel level: %d of %d", getFuelLevel(), fuelNeeded)
 while getFuelLevel() < fuelNeeded do
-  print("Not enough fuel. Please put fuel in the first slot and press any key.")
+  print(sf("Not enough fuel: %d/%d. Please put fuel in the first slot and press enter.", getFuelLevel(), fuelNeeded))
   io.read()
   if not refuel() then exit() end
   dp("Fuel level: %d of %d", getFuelLevel(), fuelNeeded)
 end
 
--- Create new startup
-shell.run("copy", "mine_startup startup")
-file = fs.open("_mine_info", "w")
-file.write(startY .. " " .. y)
+-- Create new startup file
+file = fs.open("startup", "w")
+file.write(startupString)
 file.close()
+
+function updateStartupInfo()
+  file = fs.open("_mine_info", "w")
+  file.write(startY .. " " .. y)
+  file.close()
+
+updateStartupInfo()
+  
 
 function deposit()
   if enderChest then
@@ -76,46 +115,36 @@ function _enderDeposit()
 end
 
 function _regularDeposit()
-  oldX = lx
-  oldZ = lz
-  oldY = y
-  offset = 0
+  local oldX = x
+  local oldZ = z
+  local oldY = y
+  local offset = 0
 
-  if ldirX == -1 or (ldirZ == -1 and not lz == 1) then
-    lmoveToX(lx+1, 1)
+  if dirX == -1 or dirZ == -1 then
+    moveToX(x+1)
     offset = 1
   end
 
-  lmoveToZ(0, 1)
-  lmoveToX(0, 1)
-  moveToY(startY, 1)
-  lfaceW()
+  moveToZ(0)
+  moveToX(0)
+  moveToY(startY)
+  faceXNeg()
   for i = 1, 16 do
     select(i)
     drop()
   end
-  alreadyDiscarded = false
-  moveToY(oldY, 1)
-  lmoveToX(oldX+offset, 1)
-  lmoveToZ(oldZ, 1)
-  lmoveToX(lx-offset, 1)
+  moveToY(oldY)
+  moveToX(oldX+offset)
+  moveToZ(oldZ)
+  moveToX(lx-offset)
 end
 
 
-alreadyDiscarded = false
 function discard()
-  if alreadyDiscarded then
-    deposit()
-    return
-  end
-
   sortInv(1, max)
   for i = 1, max do
-    name = getItemName(i)
-    if name == "dirt"
-    or name == "cobblestone"
-    or name == "gravel"
-    then
+    local name = getItemName(i)
+    if discardNames[name] then
       select(i)
       drop()
     end
@@ -128,28 +157,30 @@ function discard()
       load = load+1
     end
   end
-  if load >= 12 then alreadyDiscarded = true end
+  if load >= max - 2 then
+    deposit()
+  end
 end
 
 
 -- Override
 function dig()
   if turtle.dig() then
-    if isInventoryFull(1, max) then discard() end
+    if isInventoryFull() then discard() end
   end
 end
 
 -- Override
 function digDown()
   if turtle.digDown() then
-    if isInventoryFull(1, max) then discard() end
+    if isInventoryFull() then discard() end
   end
 end
 
 -- Override
 function digUp()
   if turtle.digUp() then
-    if isInventoryFull(1, max) then discard() end
+    if isInventoryFull() then discard() end
   end
 end
 
@@ -163,48 +194,41 @@ function mine(xSize, zSize, topLevel, botLevel)
 
   if enderChest then _enderDeposit() end
 
-  lmoveToZ(0, 1)
-  lmoveToX(0, 1)
-  moveToY(startY, 1)
+  moveToZ(0)
+  moveToX(0)
+  moveToY(startY)
   if not enderChest then
-    lfaceW()
+    faceXNeg()
     for i = 1, max do
       select(i)
       drop()
     end
   end
-  lfaceE()
+  faceX()
 end
 
 function _mineLevel(xSize, zSize)
   dp("Mining level...")
-  moveDown(1, 1)
+  moveToY(y-1)
 
-  -- Update startup stuff
-  file = fs.open("_mine_info", "w")
-  file.write(startY .. " " .. y)
-  file.close()
+  updateStartupInfo()
 
-  lmoveToX(xSize-1, 1)
-  while lx > 1 do
-    lmoveToZ(zSize-1, 1)
-    lmoveToX(lx-1, 1)
-    lmoveToZ(1, 1)
-    lmoveToX(lx-1, 1)
+  moveToX(xSize-1, 1)
+  while x > 1 do
+    moveToZ(zSize-1, 1)
+    moveToX(x-1, 1)
+    moveToZ(1, 1)
+    moveToX(x-1, 1)
   end
-  lmoveToZ(zSize-1, 1)
-  if lx == 1 then
-    lmoveToX(lx-1, 1)
+  moveToZ(zSize-1, 1)
+  if x == 1 then
+    moveToX(lx-1, 1)
   end
-  lmoveToZ(0, 1)
-  faceE()
+  moveToZ(0, 1)
+  faceX()
 end
 
 mine(xSize, zSize, topLevel, botLevel)
 
 shell.run("rm", "_mine_info")
 shell.run("rm", "startup")
-
-function dig() turtle.dig() end
-function digDown() turtle.digDown() end
-function digUp() turtle.digUp() end

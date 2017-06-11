@@ -1,17 +1,11 @@
--- API of doom
+-- API
  
 -- Usage:
--- Preface script with 'if not api then shell.run("api", [facing]) end'
--- Facing is
--- "east"  or 0 (DEFAULT)
--- "south" or 1
--- "west"  or 2
--- "north" or 3
+-- shell.run("api")
 
-if api == true then
+-- "Include guard"
+if api then
   do return end
-else
-  api = true
 end
 
 -- DEBUG PRINT
@@ -36,26 +30,10 @@ shell.run("rom/apis/rednet")
 -- VARIABLES
 -------------------------------------------------------------------------------
  
-apiargs = {...}
-if #apiargs > 0 then
-  dp("API: called with arg: %s", apiargs[1])
-end
+--apiargs = {...}
 
-x, z, y = gps.locate(5)
-if x then
-  dp("API: gps located %d %d %d", x, z, y)
-end
-
-if not x then x, z, y = 0, 0, 0 end
+x, z, y = 0, 0, 0 end
 dirX, dirZ = 1, 0
- 
-if     apiargs[1] == "south" or apiargs[1] == 1 then
-  dirX, dirZ = 0, 1
-elseif apiargs[1] == "west"  or apiargs[1] == 2 then
-  dirX, dirZ = -1, 0
-elseif apiargs[1] == "north" or apiargs[1] == 3 then
-  dirX, dirZ = 0, -1
-end
  
 -------------------------------------------------------------------------------
 -- MOVEMENT
@@ -66,18 +44,16 @@ end
 -- Relative movement
 
 function moveForward(n, d)
-  d = d or 0
-  moves = 0
+  local d = d or 0
+  local moves = 0
   dp("Moving forward %d time(s)", n)
   while moves < n do
-    if d == 1 and detect() then
+    if d and detect() then
       dig()
     end
     if forward() then
       x = x+dirX
       z = z+dirZ
-      lx = lx+ldirX
-      lz = lz+ldirZ
       moves = moves+1
     else
       os.sleep(1)
@@ -101,11 +77,11 @@ function moveLeft(n, d)
 end
 
 function moveUp(n, d)
-  d = d or 0
-  moves = 0
+  local d = d or 0
+  local moves = 0
   dp("Moving up %d time(s)", n)
   while moves < n do
-    if d == 1 and detectUp() then
+    if d and detectUp() then
       digUp()
     end
     if up() then
@@ -118,11 +94,11 @@ function moveUp(n, d)
 end
 
 function moveDown(n, d)
-  d = d or 0
-  moves = 0
+  local d = d or 0
+  local moves = 0
   dp("Moving down %d time(s)", n)
   while moves < n do
-    if d == 1 and detectDown() then
+    if d and detectDown() then
       digDown()
     end
     if down() then
@@ -137,85 +113,103 @@ end
 -- Absolute movement
  
 function moveToX(tx, d)
-  d = d or 0
+  local d = d or 0
   dp("Moving from x=%d to x=%d", x, tx)
-  if x < tx then
-    faceE()
-    moveForward(tx-x, d)
-  elseif x > tx then
-    faceW()
-    moveForward(x-tx, d)
+  while x < tx then
+    faceX()
+    if d and detect() then
+      dig()
+    end
+    faceX()
+    if forward() then
+      x = x+dirX
+      z = z+dirZ
+    else
+      os.sleep(1)
+    end
+  end
+  while x > tx then
+    faceXNeg()
+    if d and detect() then
+      dig()
+    end
+    faceXNeg()
+    if forward() then
+      x = x+dirX
+      z = z+dirZ
+    else
+      os.sleep(1)
+    end
   end
 end
  
 function moveToZ(tz, d)
-  d = d or 0
+  local d = d or 0
   dp("Moving from z=%d to z=%d", z, tz)
-  if z < tz then
-    faceS()
-    moveForward(tz-z, d)
-  elseif z > tz then
-    faceN()
-    moveForward(z-tz, d)
+  while z < tz then
+    faceZ()
+    if d and detect() then
+      dig()
+    end
+    faceZ()
+    if forward() then
+      x = x+dirX
+      z = z+dirZ
+    else
+      os.sleep(1)
+    end
+  end
+  while z > tz then
+    faceZNeg()
+    if d and detect() then
+      dig()
+    end
+    faceZNeg()
+    if forward() then
+      x = x+dirX
+      z = z+dirZ
+    else
+      os.sleep(1)
+    end
   end
 end
  
 function moveToY(ty, d)
-  d = d or 0
+  local d = d or 0
   dp("Moving from y=%d to y=%d", y, ty)
-  if y < ty then
-    moveUp(ty-y, d)
-  elseif y > ty then
-    moveDown(y-ty, d)
+  while y < ty then
+    if d and detectUp() then
+      digUp()
+    end
+    if up() then
+      y = y+1
+    else
+      os.sleep(1)
+    end
+  end
+  while y > ty then
+    if d and detectDown() then
+      digDown()
+    end
+    if down() then
+      y = y-1
+    else
+      os.sleep(1)
+    end
   end
 end
-
--- Local absolute movement
-
-lx = 0
-lz = 0
-ly = 0
-ldirX = 1
-ldirZ = 0 
-
-function lmoveToX(tx, d)
-  d = d or 0
-  dp("Local moving from lx=%d to lx=%d", lx, tx)
-  if lx < tx then
-    lfaceE()
-    moveForward(tx-lx, d)
-  elseif lx > tx then
-    lfaceW()
-    moveForward(lx-tx, d)
-  end
-end
- 
-function lmoveToZ(tz, d)
-  d = d or 0
-  dp("Local moving from lz=%d to lz=%d", lz, tz)
-  if lz < tz then
-    lfaceS()
-    moveForward(tz-lz, d)
-  elseif lz > tz then
-    lfaceN()
-    moveForward(lz-tz, d)
-  end
-end
-
 
 -- Turn functions, with implemented direction
- 
+
 function right()
   if turnRight() then
     dirX, dirZ = -dirZ, dirX
-    ldirX, ldirZ = -ldirZ, ldirX
   end
 end
  
 function left()
   if turnLeft() then
     dirX, dirZ = dirZ, -dirX
-    ldirX, ldirZ = ldirZ, -ldirX
   end
 end
  
@@ -227,7 +221,7 @@ end
 -- Turn towards a specific direction
 -- n = negative
  
-function faceE()
+function faceX()
   if dirX == 0 then
     if dirZ == 1 then left() else right() end
   elseif dirX == -1 then
@@ -235,7 +229,7 @@ function faceE()
   end
 end
  
-function faceW()
+function faceXNeg()
   if dirX == 0 then
     if dirZ == 1 then right() else left() end
   elseif dirX == 1 then
@@ -243,7 +237,7 @@ function faceW()
   end
 end
  
-function faceS()
+function faceZ()
   if dirZ == 0 then
     if dirX == 1 then right() else left() end
   elseif dirZ == -1 then
@@ -251,7 +245,7 @@ function faceS()
   end
 end
  
-function faceN()
+function faceZNeg()
   if ldirZ == 0 then
     if ldirX == 1 then left() else right() end
   elseif ldirZ == 1 then
@@ -259,117 +253,16 @@ function faceN()
   end
 end
 
-function lfaceE()
-  if ldirX == 0 then
-    if ldirZ == 1 then left() else right() end
-  elseif ldirX == -1 then
-    turn()
-  end
-end
- 
-function lfaceW()
-  if ldirX == 0 then
-    if ldirZ == 1 then right() else left() end
-  elseif ldirX == 1 then
-    turn()
-  end
-end
- 
-function lfaceS()
-  if ldirZ == 0 then
-    if ldirX == 1 then right() else left() end
-  elseif ldirZ == -1 then
-    turn()
-  end
-end
- 
-function lfaceN()
-  if ldirZ == 0 then
-    if ldirX == 1 then left() else right() end
-  elseif ldirZ == 1 then
-    turn()
-  end
-end
-
-function getFacing()
-  if     dirX ==  1 then return "east"
-  elseif dirZ ==  1 then return "south"
-  elseif dirX == -1 then return "west"
-  else                   return "north"
-  end
-end
- 
--------------------------------------------------------------------------------
--- BUILDING
--------------------------------------------------------------------------------
- 
--- 'placeTo' functions
--- Kinda like moveTo, except placing a block for each step
--- d = direction. 1 for up, 2 for right, 3 for down, 4 for left
- 
-function placeToX(tx, d)
-  while x < tx do
-    faceN()
-    place(d)
-    if forward() then x = x+1 else os.sleep(1) end
-  end
-  while x > tx do
-    faceS()
-    place(d)
-    if forward() then x = x-1 else os.sleep(1) end
-  end
-  place(d)
-end
- 
-function placeToZ(tz, d)
--- Move to target z 'tz'.
-  while z < tz do
-    faceE()
-    place(d)
-    if forward() then z = z+1 else os.sleep(1) end
-  end
-  while z > tz do
-    faceW()
-    place(d)
-    if forward() then z = z-1 else os.sleep(1) end
-  end
-  place(d)
-end
- 
-function placeToY(ty, d)
--- Move to target height 'th'.
-  while y > ty do
-    place(d)
-    if down() then y = y-1 else os.sleep(1) end
-  end
-  while y < ty do
-    place(d)
-    if up() then y = y+1 else os.sleep(1) end
-  end
-end
-
-function moveToPos(tx, tz, ty, d)
-  moveToX(tx, d)
-  moveToZ(tz, d)
-  moveToY(ty, d)
-end
- 
-function place(d)
-  if not d then turtle.place() end
-  if d == 1 then placeUp()
-  elseif d == 2 then right(); place(); left()
-  elseif d == 3 then placeDown()
-  elseif d == 4 then left(); place(); right() end
-end
- 
 -------------------------------------------------------------------------------
 -- INVENTORY
 -------------------------------------------------------------------------------
  
-function sortInv(first, last)
+function compactInventory(first, last)
+  -- Runs through each pair of items and tries to add one to the
+  -- other if they are the same
   dp("Sorting inventory...")
-  first = first or 1
-  last = last or 16
+  local first = first or 1
+  local last = last or 16
   for i=first+1, last do
     turtle.select(i)
     for j=first, i-1 do
@@ -382,8 +275,8 @@ end
  
 function isInventoryFull(first, last)
   dp("Checking for full inventory")
-  first = first or 1
-  last = last or 16
+  local first = first or 1
+  local last = last or 16
   local load = 0
   for i=first, last do
     if getItemCount(i) > 0 then
@@ -412,9 +305,10 @@ end
 -- Split a string into a list at chosen separator
 function split(inputstr, sep)
   if sep == nil then
-    sep = "%s"
+    local sep = "%s"
   end
-  t={} ; i=1
+  local t={}
+  local i=1
   for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
     t[i] = str
     i = i + 1
@@ -458,16 +352,6 @@ function inspectMod()
   return splitname[1]
 end
 
--------------------------------------------------------------------------------
--- ITEM NAME LISTS
--------------------------------------------------------------------------------
---[[
-chestNames = {["chest"] = true, ["BlockIronChest"] = true}
-function isChest(name)
-  if chestNames[name] then
-    return true
-  else
-    return false
-  end
-end
---]]
+
+
+api = true

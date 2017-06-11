@@ -1,7 +1,7 @@
 args = { ... }
 
 -- Syntax: mine [from level] [to level] [size|xsize zsize]
--- Must have appropriate ender chest in slot 16
+-- Appropriate ender chest in slot 16
 
 if not api then shell.run("api.lua") end
 

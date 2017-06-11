@@ -120,7 +120,7 @@ end
 function moveDown(n, d)
   d = d or 0
   moves = 0
-  dp("Moving down %d time(s)", d)
+  dp("Moving down %d time(s)", n)
   while moves < n do
     if d == 1 and detectDown() then
       digDown()

@@ -103,7 +103,7 @@ end
 function moveUp(n, d)
   d = d or 0
   moves = 0
-  dp("Moving up %d time(s)")
+  dp("Moving up %d time(s)", n)
   while moves < n do
     if d == 1 and detectUp() then
       digUp()

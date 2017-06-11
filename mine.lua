@@ -106,6 +106,7 @@ alreadyDiscarded = false
 function discard()
   if alreadyDiscarded then
     deposit()
+    return
   end
 
   sortInv(1, max)

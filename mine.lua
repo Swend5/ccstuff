@@ -122,7 +122,7 @@ function _regularDeposit()
   local oldY = y
   local offset = 0
 
-  if dirX == -1 or dirZ == -1 then
+  if (dirX == -1 or dirZ == -1) and (not x == xSize - 1) then
     moveToX(x+1)
     offset = 1
   end

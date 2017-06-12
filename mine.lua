@@ -2,6 +2,8 @@ args = { ... }
 
 -- Syntax: mine [current y] [from level] [to level] [size|xsize zsize]
 -- Appropriate ender chest in slot 16, if relevant
+-- or chest for depositing behind the turtle.
+-- Chest with fuel above that.
 
 if fs.exists("api") then
   shell.run("api")
@@ -74,11 +76,11 @@ end
 print(sf("Mining %d levels from %d to %d in a %dx%d area", topLevel-botLevel+1, topLevel, botLevel, xSize, zSize))
 
 -- Calculate fuel approximate fuel needed, ask for a refuel if fuel is too low
-fuelNeeded = (topLevel - botLevel + 1) * xSize * zSize * 1.1
-if getFuelLevel() < fuelNeeded then
-  print(sf("Not enough fuel: %d/%d. Please refuel.", getFuelLevel(), fuelNeeded))
-  do return end
-end
+--fuelNeeded = (topLevel - botLevel + 1) * xSize * zSize * 1.1
+--if getFuelLevel() < fuelNeeded then
+--  print(sf("Not enough fuel: %d/%d. Please refuel.", getFuelLevel(), fuelNeeded))
+--  do return end
+--end
 
 -- Create new startup file
 file = fs.open("startup", "w")
@@ -100,7 +102,11 @@ function deposit()
     _enderDeposit()
   else
     dp("Depositing without enderchest")
-    _regularDeposit()
+    if getFuelLevel() > 2500 then
+      _regularDeposit()
+    else
+      depositAndRefuel()
+    end
   end
 end
 
@@ -142,6 +148,43 @@ function _regularDeposit()
   moveToX(x-offset)
 end
 
+function depositAndRefuel()
+  local oldX = x
+  local oldZ = z
+  local oldY = y
+  local offset = 0
+
+  if (dirX == -1 or dirZ == -1) and (not x == xSize - 1) then
+    moveToX(x+1)
+    offset = 1
+  end
+
+  moveToZ(0)
+  moveToX(0)
+  moveToY(startY)
+  faceXNeg()
+  for i = 1, 16 do
+    turtle.select(i)
+    drop()
+  end
+  turtle.select(1)
+
+  moveUp()
+  while getFuelLevel() < 20000 do
+    suck()
+    refuel()
+    if getItemCount(1) > 0 then
+      right()
+      drop()
+      left()
+    end
+  end
+  moveDown()
+
+  moveToY(oldY)
+  moveToX(oldX+offset)
+  moveToZ(oldZ)
+  moveToX(x-offset)
 
 function discard()
   compactInventory(1, max)
@@ -194,6 +237,9 @@ function mine(xSize, zSize, topLevel, botLevel)
   moveToY(topLevel+1, 1)
   while y > botLevel do
     _mineLevel(xSize, zSize)
+    if getFuelLevel() < xSize * zSize * 1.1 then
+      depositAndRefuel()
+    end
   end
 
   if enderChest then _enderDeposit() end

@@ -8,7 +8,7 @@ if api then
   do return end
 end
 
-debug = true
+debug = false
 
 -- DEBUG PRINT
 function dp(...)

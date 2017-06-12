@@ -1,6 +1,8 @@
 
 -- Usage: lumberjack [facing]
 
+DEPRECATED
+
 -- Saplings in slot 1
 -- Birch or pine. Pine yields more wood.
 
@@ -15,7 +17,7 @@ saplingName = getItemName(1)
 while true do
 
   moveUp(1)
-  select(1)
+  turtle.select(1)
   for i = 1, 10 do
     moveForward(1)
     place(3) -- 3 for down
@@ -24,7 +26,7 @@ while true do
   turn()
 
   -- begin inspecting for trees
-  count = 0
+  local count = 0
   while count < 8 do
     moveLeft(10)
     right()
@@ -43,7 +45,7 @@ while true do
   -- get 'em
   moveDown(1)
   for i = 1, 10 do
-    select(1); dig()
+    turtle.select(1); dig()
     while inspectName() == logName do
       dig()
       moveUp(1, 1)
@@ -58,7 +60,7 @@ while true do
 
   -- deposit wood
   for i = 2, 16 do
-    select(i)
+    turtle.select(i)
     drop()
   end
 

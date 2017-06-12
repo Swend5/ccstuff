@@ -46,7 +46,8 @@ dirX, dirZ = 1, 0
 -- Relative movement
 
 function moveForward(n, d)
-  local d = d or 0
+  local n = n or 1
+  local d = d or false
   local moves = 0
   dp("Moving forward %d time(s)", n)
   while moves < n do
@@ -79,7 +80,8 @@ function moveLeft(n, d)
 end
 
 function moveUp(n, d)
-  local d = d or 0
+  local n = n or 1
+  local d = d or false
   local moves = 0
   dp("Moving up %d time(s)", n)
   while moves < n do
@@ -96,7 +98,8 @@ function moveUp(n, d)
 end
 
 function moveDown(n, d)
-  local d = d or 0
+  local n = n or 1
+  local d = d or false
   local moves = 0
   dp("Moving down %d time(s)", n)
   while moves < n do
@@ -115,7 +118,7 @@ end
 -- Absolute movement
  
 function moveToX(tx, d)
-  local d = d or 0
+  local d = d or false
   dp("Moving from x=%d to x=%d", x, tx)
   while x < tx do
     faceX()
@@ -146,7 +149,7 @@ function moveToX(tx, d)
 end
  
 function moveToZ(tz, d)
-  local d = d or 0
+  local d = d or false
   dp("Moving from z=%d to z=%d", z, tz)
   while z < tz do
     faceZ()
@@ -177,7 +180,7 @@ function moveToZ(tz, d)
 end
  
 function moveToY(ty, d)
-  local d = d or 0
+  local d = d or false
   dp("Moving from y=%d to y=%d", y, ty)
   while y < ty do
     if d and detectUp() then
@@ -221,7 +224,7 @@ function turn()
 end
  
 -- Turn towards a specific direction
--- n = negative
+-- Neg = opposite direction
  
 function faceX()
   if dirX == 0 then
@@ -266,15 +269,18 @@ function compactInventory(first, last)
   local first = first or 1
   local last = last or 16
   for i=first+1, last do
-    turtle.select(i)
+    --turtle.select(i)
+    local name1 = getItemName(i)
     for j=first, i-1 do
-      if turtle.compareTo(j) then
+      local name2 = getItemName(i)
+      if name1 == name2 then
+        turtle.select(i)
         turtle.transferTo(j)
       end
     end
   end
 end
- 
+
 function isInventoryFull(first, last)
   dp("Checking for full inventory")
   local first = first or 1
@@ -292,11 +298,27 @@ function selectByName(name)
   dp("Select by name on %q", name)
   for i = 1, 16 do
     if getItemName(i) == name then
-      select(i)
+      turtle.select(i)
       return true
     end
   end
   return false
+end
+
+function getEmptySlot()
+  for i = 1, 16 do
+    if getItemCount(i) == 0 then
+      return i
+    end
+  end
+  return -1
+end
+
+function moveToEmptySlot(slot)
+  local emptySlot = getEmptySlot()
+  if emptySlot == -1 then return false end
+  transferTo(emptySlot)
+  return true
 end
 
 
@@ -316,6 +338,16 @@ function split(inputstr, sep)
     i = i + 1
   end
   return t
+end
+
+function run(programName, ...)
+  if fs.exists(programName) then
+    shell.run(programName, ...)
+  elseif fs.exists(programName .. ".lua") then
+    shell.run(programName .. ".lua", ...)
+  else
+    print("Could not run \'" .. programName .. "\'.")
+  end
 end
 
 -------------------------------------------------------------------------------

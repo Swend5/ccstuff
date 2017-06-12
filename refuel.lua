@@ -1,15 +1,7 @@
-lastFuel = -1
 print("Current fuel level: " .. turtle.getFuelLevel())
-while true do
-  for i=1, 16 do
-    turtle.select(i)
-    turtle.refuel()
-  end
-  fuel = turtle.getFuelLevel()
-  if fuel == lastFuel then
-    break
-  end
-  lastFuel = fuel
-  os.sleep(1)
+for i=1, 16 do
+  turtle.select(i)
+  turtle.refuel()
 end
+turtle.select(1)
 print("Refuel complete. Fuel level: " .. turtle.getFuelLevel())

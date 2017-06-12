@@ -9,6 +9,7 @@ elseif fs.exists("api.lua") then
   shell.run("api.lua")
 else
   print("Error: couldn't find api.")
+  do return end
 end
 
 startupString = [[
@@ -104,15 +105,15 @@ function deposit()
 end
 
 function _enderDeposit()
-  select(16)
+  turtle.select(16)
   if not place() then turtle.dig(); place() end
   for i = 1, 15 do
-    select(i)
+    turtle.select(i)
     drop()
   end
-  select(16)
+  turtle.select(16)
   dig()
-  select(1)
+  turtle.select(1)
 end
 
 function _regularDeposit()
@@ -131,9 +132,10 @@ function _regularDeposit()
   moveToY(startY)
   faceXNeg()
   for i = 1, 16 do
-    select(i)
+    turtle.select(i)
     drop()
   end
+  turtle.select(1)
   moveToY(oldY)
   moveToX(oldX+offset)
   moveToZ(oldZ)
@@ -146,11 +148,11 @@ function discard()
   for i = 1, max do
     local name = getItemName(i)
     if discardNames[name] then
-      select(i)
+      turtle.select(i)
       drop()
     end
   end
-  select(1)
+  turtle.select(1)
 
   local load = 0
   for i = 1, max do
@@ -202,7 +204,7 @@ function mine(xSize, zSize, topLevel, botLevel)
   if not enderChest then
     faceXNeg()
     for i = 1, max do
-      select(i)
+      turtle.select(i)
       drop()
     end
   end

@@ -1,5 +1,7 @@
 args = {...}
 
+DEPRECATED
+
 -- Usage
 -- build template_file_name
 

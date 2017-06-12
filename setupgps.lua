@@ -1,7 +1,7 @@
 args = {...}
 
 -- Must be run first time:
--- - with XX wireless turtles in slot 1
+-- - with 4 wireless turtles in slot 1
 -- - with a disk drive in slot 2
 -- - with a floppy disk in slot 3
 

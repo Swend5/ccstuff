@@ -214,7 +214,7 @@ end
 
 function _mineLevel(xSize, zSize)
   dp("Mining level...")
-  moveToY(y-1)
+  moveToY(y-1, 1)
 
   updateStartupInfo()
 

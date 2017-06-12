@@ -8,6 +8,8 @@ if api then
   do return end
 end
 
+debug = true
+
 -- DEBUG PRINT
 function dp(...)
   if debug then
@@ -32,7 +34,7 @@ shell.run("rom/apis/rednet")
  
 --apiargs = {...}
 
-x, z, y = 0, 0, 0 end
+x, z, y = 0, 0, 0
 dirX, dirZ = 1, 0
  
 -------------------------------------------------------------------------------
@@ -115,7 +117,7 @@ end
 function moveToX(tx, d)
   local d = d or 0
   dp("Moving from x=%d to x=%d", x, tx)
-  while x < tx then
+  while x < tx do
     faceX()
     if d and detect() then
       dig()
@@ -128,7 +130,7 @@ function moveToX(tx, d)
       os.sleep(1)
     end
   end
-  while x > tx then
+  while x > tx do
     faceXNeg()
     if d and detect() then
       dig()
@@ -146,7 +148,7 @@ end
 function moveToZ(tz, d)
   local d = d or 0
   dp("Moving from z=%d to z=%d", z, tz)
-  while z < tz then
+  while z < tz do
     faceZ()
     if d and detect() then
       dig()
@@ -159,7 +161,7 @@ function moveToZ(tz, d)
       os.sleep(1)
     end
   end
-  while z > tz then
+  while z > tz do
     faceZNeg()
     if d and detect() then
       dig()
@@ -177,7 +179,7 @@ end
 function moveToY(ty, d)
   local d = d or 0
   dp("Moving from y=%d to y=%d", y, ty)
-  while y < ty then
+  while y < ty do
     if d and detectUp() then
       digUp()
     end
@@ -187,7 +189,7 @@ function moveToY(ty, d)
       os.sleep(1)
     end
   end
-  while y > ty then
+  while y > ty do
     if d and detectDown() then
       digDown()
     end
@@ -246,9 +248,9 @@ function faceZ()
 end
  
 function faceZNeg()
-  if ldirZ == 0 then
-    if ldirX == 1 then left() else right() end
-  elseif ldirZ == 1 then
+  if dirZ == 0 then
+    if dirX == 1 then left() else right() end
+  elseif dirZ == 1 then
     turn()
   end
 end
@@ -353,5 +355,5 @@ function inspectMod()
 end
 
 
-
+print("API loaded succesfully")
 api = true

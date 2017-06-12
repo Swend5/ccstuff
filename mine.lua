@@ -3,12 +3,13 @@ args = { ... }
 -- Syntax: mine [current y] [from level] [to level] [size|xsize zsize]
 -- Appropriate ender chest in slot 16, if relevant
 
-if fs.exists("api.lua") then
+if fs.exists("api") then
+  shell.run("api")
+elseif fs.exists("api.lua") then
   shell.run("api.lua")
 else
-  shell.run("api")
+  print("Error: couldn't find api.")
 end
-  
 
 startupString = [[
 if not fs.exists("_mine_info") then
@@ -44,6 +45,7 @@ discardNames = {
 }
 
 startY = tonumber(args[1])
+y = startY
 topLevel = tonumber(args[2])
 botLevel = tonumber(args[3])
 
@@ -58,6 +60,7 @@ else
   do return end
 end
 
+print(getItemName == nil)
 enderChest = getItemName(16) == "enderChest"
 if enderChest then
   dp("Enderchest found")
@@ -71,12 +74,9 @@ print(sf("Mining %d levels from %d to %d in a %dx%d area", topLevel-botLevel+1, 
 
 -- Calculate fuel approximate fuel needed, ask for a refuel if fuel is too low
 fuelNeeded = (topLevel - botLevel + 1) * xSize * zSize * 1.1
-dp("Fuel level: %d of %d", getFuelLevel(), fuelNeeded)
-while getFuelLevel() < fuelNeeded do
-  print(sf("Not enough fuel: %d/%d. Please put fuel in the first slot and press enter.", getFuelLevel(), fuelNeeded))
-  io.read()
-  if not refuel() then exit() end
-  dp("Fuel level: %d of %d", getFuelLevel(), fuelNeeded)
+if getFuelLevel() < fuelNeeded then
+  print(sf("Not enough fuel: %d/%d. Please refuel.", getFuelLevel(), fuelNeeded))
+  do return end
 end
 
 -- Create new startup file
@@ -88,6 +88,7 @@ function updateStartupInfo()
   file = fs.open("_mine_info", "w")
   file.write(startY .. " " .. y)
   file.close()
+end
 
 updateStartupInfo()
   
@@ -136,12 +137,12 @@ function _regularDeposit()
   moveToY(oldY)
   moveToX(oldX+offset)
   moveToZ(oldZ)
-  moveToX(lx-offset)
+  moveToX(x-offset)
 end
 
 
 function discard()
-  sortInv(1, max)
+  compactInventory(1, max)
   for i = 1, max do
     local name = getItemName(i)
     if discardNames[name] then
@@ -187,6 +188,7 @@ end
 function mine(xSize, zSize, topLevel, botLevel)
   dp("Beginning mine procedure:")
   dp("xSize: %d, zSize %d, top: %d, bot: %d", xSize, zSize, topLevel, botLevel)
+  
   moveToY(topLevel+1, 1)
   while y > botLevel do
     _mineLevel(xSize, zSize)
@@ -205,6 +207,7 @@ function mine(xSize, zSize, topLevel, botLevel)
     end
   end
   faceX()
+
 end
 
 function _mineLevel(xSize, zSize)
@@ -222,7 +225,7 @@ function _mineLevel(xSize, zSize)
   end
   moveToZ(zSize-1, 1)
   if x == 1 then
-    moveToX(lx-1, 1)
+    moveToX(x-1, 1)
   end
   moveToZ(0, 1)
   faceX()

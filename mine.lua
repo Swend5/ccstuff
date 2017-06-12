@@ -39,10 +39,10 @@ print("Ready after disrupted mining.")
 ]]
 
 discardNames = {
-  "dirt",
-  "sand",
-  "cobblestone",
-  "gravel",
+  "dirt" = true,
+  "sand" = true,
+  "cobblestone" = true,
+  "gravel" = true,
 }
 
 startY = tonumber(args[1])

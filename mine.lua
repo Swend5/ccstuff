@@ -185,6 +185,7 @@ function depositAndRefuel()
   moveToX(oldX+offset)
   moveToZ(oldZ)
   moveToX(x-offset)
+end
 
 function discard()
   compactInventory(1, max)

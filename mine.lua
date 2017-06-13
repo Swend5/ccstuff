@@ -126,12 +126,6 @@ function _regularDeposit()
   local oldX = x
   local oldZ = z
   local oldY = y
-  local offset = 0
-
-  if (dirX == -1 or dirZ == -1) and (not x == xSize - 1) then
-    moveToX(x+1)
-    offset = 1
-  end
 
   moveToZ(0)
   moveToX(0)
@@ -143,21 +137,14 @@ function _regularDeposit()
   end
   turtle.select(1)
   moveToY(oldY)
-  moveToX(oldX+offset)
+  moveToX(oldX)
   moveToZ(oldZ)
-  moveToX(x-offset)
 end
 
 function depositAndRefuel()
   local oldX = x
   local oldZ = z
   local oldY = y
-  local offset = 0
-
-  if (dirX == -1 or dirZ == -1) and (not x == xSize - 1) then
-    moveToX(x+1)
-    offset = 1
-  end
 
   moveToZ(0)
   moveToX(0)
@@ -182,9 +169,8 @@ function depositAndRefuel()
   moveDown()
 
   moveToY(oldY)
-  moveToX(oldX+offset)
+  moveToX(oldX)
   moveToZ(oldZ)
-  moveToX(x-offset)
 end
 
 function discard()
@@ -265,20 +251,39 @@ function _mineLevel(xSize, zSize)
 
   updateStartupInfo()
 
-  moveToX(xSize-1, 1)
-  while x > 1 do
-    moveToZ(zSize-1, 1)
-    moveToX(x-1, 1)
-    moveToZ(1, 1)
-    moveToX(x-1, 1)
+  while z < zSize - 1 do
+    moveToX(xSize - 1, 1)
+    moveToZ(z + 1, 1)
+    moveToX(0, 1)
+    moveToZ(z + 1, 1)
   end
-  moveToZ(zSize-1, 1)
-  if x == 1 then
-    moveToX(x-1, 1)
+  if z == zSize - 1 then
+    moveToX(xSize - 1, 1)
   end
   moveToZ(0, 1)
+  moveToX(0, 1)
   faceX()
 end
+
+--  dp("Mining level...")
+--  moveToY(y-1, 1)
+--
+--  updateStartupInfo()
+--
+--  moveToX(xSize-1, 1)
+--  while x > 1 do
+--    moveToZ(zSize-1, 1)
+--    moveToX(x-1, 1)
+--    moveToZ(1, 1)
+--    moveToX(x-1, 1)
+--  end
+--  moveToZ(zSize-1, 1)
+--  if x == 1 then
+--    moveToX(x-1, 1)
+--  end
+--  moveToZ(0, 1)
+--  faceX()
+--end
 
 mine(xSize, zSize, topLevel, botLevel)
 

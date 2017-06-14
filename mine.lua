@@ -281,6 +281,7 @@ function patch()
     moveToZ(0)
     moveToX(0)
     faceX()
+    return false
   end
   left()
   if not detect() then place() end
@@ -291,24 +292,25 @@ function patch()
   else
     os.sleep(1)
   end
+  return true
 end
 
 function patchLevel()
   while x < xSize - 1 do
     faceX()
-    patch()
+    if not patch() then return end
   end
   while z < zSize - 1 do
     faceZ()
-    patch()
+    if not patch() then return end
   end
   while x > 0 do
     faceXNeg()
-    patch()
+    if not patch() then return end
   end
   while z > 0 do
     faceZNeg()
-    patch()
+    if not patch() then return end
   end
 end
 

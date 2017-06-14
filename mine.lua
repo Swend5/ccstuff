@@ -1,3 +1,4 @@
+-- 1
 args = { ... }
 
 -- Syntax: mine [current y] [from level] [to level] [size|xsize zsize]
@@ -83,13 +84,6 @@ end
 
 -- Print information
 print(sf("Mining %d levels from %d to %d in a %dx%d area", topLevel-botLevel+1, topLevel, botLevel, xSize, zSize))
-
--- Calculate fuel approximate fuel needed, ask for a refuel if fuel is too low
---fuelNeeded = (topLevel - botLevel + 1) * xSize * zSize * 1.1
---if getFuelLevel() < fuelNeeded then
---  print(sf("Not enough fuel: %d/%d. Please refuel.", getFuelLevel(), fuelNeeded))
---  do return end
---end
 
 -- Create new startup file
 file = fs.open("startup", "w")

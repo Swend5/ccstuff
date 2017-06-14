@@ -1,6 +1,8 @@
 -- 1
 args = { ... }
 
+usageString = "Usage: mine [current y] [from level] [to level] [size|xsize zsize]"
+
 -- Syntax: mine [current y] [from level] [to level] [size|xsize zsize]
 -- Appropriate ender chest in slot 16, if relevant
 -- or chest for depositing behind the turtle.
@@ -53,6 +55,9 @@ discardNames = {
   ["sand"] = true,
   ["cobblestone"] = true,
   ["gravel"] = true,
+  ["andesite"] = true,
+  ["marble"] = true,
+  ["granite"] = true,
 }
 
 depositing = false
@@ -69,7 +74,7 @@ elseif #args == 5 then
   xSize = tonumber(args[4])
   zSize = tonumber(args[5])
 else
-  print("Usage: mine [current y] [from level] [to level] [size|xsize zsize]")
+  print(usageString)
   do return end
 end
 

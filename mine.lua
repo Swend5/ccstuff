@@ -54,6 +54,8 @@ discardNames = {
   ["gravel"] = true,
 }
 
+depositing = false
+
 startY = tonumber(args[1])
 y = startY
 topLevel = tonumber(args[2])
@@ -130,32 +132,35 @@ function _enderDeposit()
 end
 
 function _regularDeposit()
+  depositing = true
   local oldX = x
   local oldZ = z
   local oldY = y
 
-  moveToZ(0)
-  moveToX(0)
-  moveToY(startY)
+  moveToZ(0, 1)
+  moveToX(0, 1)
+  moveToY(startY, 1)
   faceXNeg()
   for i = 1, 16 do
     turtle.select(i)
     drop()
   end
   turtle.select(1)
-  moveToY(oldY)
-  moveToX(oldX)
-  moveToZ(oldZ)
+  moveToY(oldY, 1)
+  moveToX(oldX, 1)
+  moveToZ(oldZ, 1)
+  depositing = false
 end
 
 function depositAndRefuel()
+  depositing = true
   local oldX = x
   local oldZ = z
   local oldY = y
 
-  moveToZ(0)
-  moveToX(0)
-  moveToY(startY)
+  moveToZ(0, 1)
+  moveToX(0, 1)
+  moveToY(startY, 1)
   faceXNeg()
   for i = 1, 16 do
     turtle.select(i)
@@ -175,9 +180,10 @@ function depositAndRefuel()
   end
   moveDown()
 
-  moveToY(oldY)
-  moveToX(oldX)
-  moveToZ(oldZ)
+  moveToY(oldY, 1)
+  moveToX(oldX, 1)
+  moveToZ(oldZ, 1)
+  depositing = false
 end
 
 function discard()
@@ -206,21 +212,21 @@ end
 -- Override
 function dig()
   if turtle.dig() then
-    if isInventoryFull() then discard() end
+    if (not depositing) and isInventoryFull() then discard() end
   end
 end
 
 -- Override
 function digDown()
   if turtle.digDown() then
-    if isInventoryFull() then discard() end
+    if (not depositing) and isInventoryFull() then discard() end
   end
 end
 
 -- Override
 function digUp()
   if turtle.digUp() then
-    if isInventoryFull() then discard() end
+    if (not depositing) and isInventoryFull() then discard() end
   end
 end
 
@@ -238,6 +244,7 @@ function mine(xSize, zSize, topLevel, botLevel)
 
   if enderChest then _enderDeposit() end
 
+  depositing = true
   moveToZ(0)
   moveToX(0)
   moveToY(startY)
@@ -249,7 +256,7 @@ function mine(xSize, zSize, topLevel, botLevel)
     end
   end
   faceX()
-
+  depositing = false
 end
 
 function _mineLevel(xSize, zSize)

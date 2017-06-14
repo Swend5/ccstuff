@@ -270,68 +270,47 @@ function _mineLevel(xSize, zSize)
   moveToZ(0, 1)
   moveToX(0, 1)
   faceX()
-  patchLevel()
 end
 
-function patch()
-  if  not selectByName("cobblestone")
-  and not selectByName("dirt")
-  and not selectByName("sandstone")
-  then
-    moveToZ(0)
-    moveToX(0)
-    faceX()
-    return false
-  end
-  left()
-  if not detect() then place() end
-  right()
-  if forward() then
-    x = x+dirX
-    z = z+dirZ
-  else
-    os.sleep(1)
-  end
-  return true
-end
-
-function patchLevel()
-  while x < xSize - 1 do
-    faceX()
-    if not patch() then return end
-  end
-  while z < zSize - 1 do
-    faceZ()
-    if not patch() then return end
-  end
-  while x > 0 do
-    faceXNeg()
-    if not patch() then return end
-  end
-  while z > 0 do
-    faceZNeg()
-    if not patch() then return end
-  end
-end
-
---  dp("Mining level...")
---  moveToY(y-1, 1)
---
---  updateStartupInfo()
---
---  moveToX(xSize-1, 1)
---  while x > 1 do
---    moveToZ(zSize-1, 1)
---    moveToX(x-1, 1)
---    moveToZ(1, 1)
---    moveToX(x-1, 1)
+--function patch()
+--  if  not selectByName("cobblestone")
+--  and not selectByName("dirt")
+--  and not selectByName("sandstone")
+--  then
+--    moveToZ(0)
+--    moveToX(0)
+--    faceX()
+--    return false
 --  end
---  moveToZ(zSize-1, 1)
---  if x == 1 then
---    moveToX(x-1, 1)
+--  left()
+--  if not detect() then place() end
+--  right()
+--  if forward() then
+--    x = x+dirX
+--    z = z+dirZ
+--  else
+--    os.sleep(1)
 --  end
---  moveToZ(0, 1)
---  faceX()
+--  return true
+--end
+--
+--function patchLevel()
+--  while x < xSize - 1 do
+--    faceX()
+--    if not patch() then return end
+--  end
+--  while z < zSize - 1 do
+--    faceZ()
+--    if not patch() then return end
+--  end
+--  while x > 0 do
+--    faceXNeg()
+--    if not patch() then return end
+--  end
+--  while z > 0 do
+--    faceZNeg()
+--    if not patch() then return end
+--  end
 --end
 
 mine(xSize, zSize, topLevel, botLevel)

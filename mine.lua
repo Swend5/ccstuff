@@ -20,7 +20,14 @@ if not fs.exists("_mine_info") then
   do return end
 end
 
-shell.run("api.lua")
+if fs.exists("api") then
+  shell.run("api")
+elseif fs.exists("api.lua") then
+  shell.run("api.lua")
+else
+  print("Error: couldn't find api.")
+  do return end
+end
 
 file = fs.open("_mine_info", "r")
 params = split(file.readAll(), " ")
@@ -263,6 +270,46 @@ function _mineLevel(xSize, zSize)
   moveToZ(0, 1)
   moveToX(0, 1)
   faceX()
+  patchLevel()
+end
+
+function patch()
+  if  not selectByName("cobblestone")
+  and not selectByName("dirt")
+  and not selectByName("sandstone")
+  then
+    moveToZ(0)
+    moveToX(0)
+    faceX()
+  end
+  left()
+  if not detect() then place() end
+  right()
+  if forward() then
+    x = x+dirX
+    z = z+dirZ
+  else
+    os.sleep(1)
+  end
+end
+
+function patchLevel()
+  while x < xSize - 1 do
+    faceX()
+    patch()
+  end
+  while z < zSize - 1 do
+    faceZ()
+    patch()
+  end
+  while x > 0 do
+    faceXNeg()
+    patch()
+  end
+  while z > 0 do
+    faceZNeg()
+    patch()
+  end
 end
 
 --  dp("Mining level...")

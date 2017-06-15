@@ -252,10 +252,11 @@ function init()
     end
   end
   -- get turtle direction relative to chest
-  if pcall(pullItem, "east", 1, 1) then direction = "east" end
-  elseif pcall(pullItem, "north", 1, 1) then direction = "north" end
-  elseif pcall(pullItem, "south", 1, 1) then direction = "south" end
-  elseif pcall(pullItem, "west", 1, 1) then direction = "west" end
+  if pcall(pullItem, "east", 1, 1) then direction = "east"
+  elseif pcall(pullItem, "north", 1, 1) then direction = "north"
+  elseif pcall(pullItem, "south", 1, 1) then direction = "south"
+  elseif pcall(pullItem, "west", 1, 1) then direction = "west"
+  end
   -- check inventory
   for i = 1, chest.getInventorySize() do
     stack = chest.getStackInSlot(i)

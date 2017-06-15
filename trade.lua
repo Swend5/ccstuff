@@ -1,4 +1,4 @@
--- 3
+-- 4
 
 if fs.exists("api") then
   shell.run("api")
@@ -257,7 +257,7 @@ function init()
   for line in io.lines("_values") do
     local line_split = split(line, " ")
     local buysell = line_split[1]
-    local item = line_split[2]
+    local name = line_split[2]
     local value = line_split[3]
     if buysell == "buy" then
       itemValueBuy[name] = tonumber(value)

@@ -254,11 +254,7 @@ end
 
 function init()
   -- read value file
-  local vFile = fs.open("_values", "r")
-  if not vFile then
-    print("Error, could not find value file")
-  end
-  for line in f:lines() do
+  for line in io.lines("_values") do
     local line_split = split(line, " ")
     local buysell = line_split[1]
     local item = line_split[2]

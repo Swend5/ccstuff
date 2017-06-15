@@ -1,14 +1,45 @@
 args = {...}
 
-DEPRECATED
-
 -- Usage
 -- build template_file_name
 
--- Imports
+-- Template file format
 
-shell.run("rom/apis/io")
-shell.run("api")
+-- <number of materials> <xsize> <zsize> <ysize>
+-- <ID char> <name>
+-- <ID char> <name>
+-- ...
+-- -
+-- <level 1 template>
+-- -
+-- <level 2 template>
+-- -
+-- ...
+
+-- Example:
+-- c cobblestone
+-- -
+-- ccc
+-- ccc
+-- ccc
+-- -
+-- c c
+-- 
+-- c c
+-- -
+-- ccc
+-- c c
+-- ccc
+
+
+if fs.exists("api") then
+  shell.run("api")
+elseif fs.exists("api.lua") then
+  shell.run("api.lua")
+else
+  print("Error: couldn't find api.")
+  do return end
+end
 
 -- Get material amounts and ids
 file = io.open(args[1], "r")
@@ -28,21 +59,7 @@ while true do
     break
   end
 
-  splitline = split(line, " ")
-  idStr = splitline[1]
-  n = tonumber(splitline[2])
-  alias = splitline[3]
-
-  id[alias] = idStr
-  amount[alias] = n
-  slots[alias] = currentSlot
-  currentSlot = currentSlot+1
-  
-  tempn = n
-  while tempn > 64 do
-    currentSlot = currentSlot+1
-    tempn = tempn - 64
-  end
+  line_split = split(line, " ")
 
 
     

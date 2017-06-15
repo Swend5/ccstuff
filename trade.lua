@@ -7,7 +7,7 @@ end
 
 function playerNearby(range)
   players = sensor.getNearbyPlayers()
-  for _, p in players do
+  for _, p in pairs(players) do
     if p.distance < range then
       return true
     end

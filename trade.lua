@@ -96,6 +96,7 @@ function transact()
   if qty > totalStock(name) then
     print("Sorry, I do not seem to have enough of that item in stock.")
     return false
+  end
   local paymentNeeded = itemValue[name] * qty
   
   print(sf("Do you want to buy %d %s, for a total value of %d? [y/n]", qty, name, paymentNeeded))

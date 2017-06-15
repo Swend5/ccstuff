@@ -1,4 +1,4 @@
--- 2
+-- 3
 args = { ... }
 
 usageString = "Usage: mine [current y] [from level] [to level] [size|xsize zsize]"
@@ -268,11 +268,12 @@ function mine(xSize, zSize, topLevel, botLevel)
   moveToY(topLevel+1, 1)
   while y > botLevel do
     _mineLevel(xSize, zSize)
-    if getFuelLevel() < xSize * zSize * 1.1 then
+    if getFuelLevel() < xSize * zSize * 1.1 + 100 then
       if not enderchest then
         depositAndRefuel()
       else
         refuelWithoutDepositing()
+      end
     end
   end
 

@@ -1,4 +1,4 @@
--- 5
+-- 6
 
 if fs.exists("api") then
   shell.run("api")
@@ -222,7 +222,7 @@ function placeSigns()
   end
   local lastString = ""
   for i = curLine, #buyLines do
-    lastString = lastString .. buyLines[i]
+    lastString = lastString .. "\n" .. buyLines[i]
   end
   moveDown()
   place(lastString)
@@ -233,7 +233,7 @@ function placeSigns()
 
   local signsNeeded = math.ceil(#sellLines/4)
   moveUp(signsNeeded + 1)
-  place("BUY VALUE")
+  place("SELL VALUE")
   local curLine = 1
   for i = 1, signsNeeded - 1 do
     moveDown()
@@ -242,7 +242,7 @@ function placeSigns()
   end
   local lastString = ""
   for i = curLine, #sellLines do
-    lastString = lastString .. sellLines[i]
+    lastString = lastString .. "\n" .. sellLines[i]
   end
   moveDown()
   place(lastString)
@@ -294,6 +294,7 @@ end
 
 init()
 placeSigns()
+help()
 -- while true do
 --   while true do
 --     player = nearbyPlayer(4)

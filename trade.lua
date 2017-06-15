@@ -1,3 +1,5 @@
+-- 1
+
 if fs.exists("api") then
   shell.run("api")
 elseif fs.exists("api.lua") then
@@ -151,11 +153,29 @@ function transact()
         slot = getEmptySlot()
       end
     end
+    turtle.select(slot)
     local numDropped = 0
     for i = 1, chest.getInventorySize() do
       if itemSlots[i] then
-        if slotQty[i] < qty - numDropped then
+        local rest = qty - numDropped
+        if slotQty[i] < rest then
           -- enough items in that slot to finish
+          slotQty[i] = slotQty[i] - rest
+          chest.pushItemIntoSlot(direction, i, slot, rest)
+          drop()
+          return true
+        else
+          numDropped = slotQty[i]
+          slotQty[i] = 0
+          chest.pushItemIntoSlot(direction, i, slot, rest)
+          drop()
+        end
+      end
+    end
+    print("I am sorry, but I seem to have made a mistake. Please contact my owner and you will be refunded.")
+    return false
+  end
+end
 
 function printStock()
   local stock = {}

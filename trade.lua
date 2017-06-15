@@ -1,4 +1,4 @@
--- 4
+-- 5
 
 if fs.exists("api") then
   shell.run("api")
@@ -199,12 +199,12 @@ function placeSigns()
   local sellLines = {}
 
   for k, v in pairs(itemValueBuy) do
-    buyLines.insert(k)
-    buyLines.insert(tostring(v))
+    table.insert(buyLines, k)
+    table.insert(buyLines, tostring(v))
   end
   for k, v in pairs(itemValueSell) do
-    sellLines.insert(k)
-    sellLines.insert(tostring(v))
+    table.insert(sellLines, k)
+    table.insert(sellLines, tostring(v))
   end
 
   moveForward(2)

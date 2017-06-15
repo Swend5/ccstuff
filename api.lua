@@ -314,6 +314,16 @@ function getEmptySlot()
   return -1
 end
 
+function selectEmptySlot()
+  local i = getEmptySlot()
+  if i == -1 then
+    return false
+  else
+    turtle.select(i)
+    return true
+  end
+end
+
 function moveToEmptySlot(slot)
   local emptySlot = getEmptySlot()
   if emptySlot == -1 then return false end

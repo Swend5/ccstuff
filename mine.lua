@@ -185,6 +185,38 @@ function depositAndRefuel()
   depositing = false
 end
 
+function refuelWithoutDepositing()
+  -- For ender chest turtles
+  depositing = true
+  local oldX = x
+  local oldZ = z
+  local oldY = y
+
+  moveToZ(0, 1)
+  moveToX(0, 1)
+  moveToY(startY + 1, 1)
+  faceXNeg()
+  if not selectEmptySlot() then
+    turn()
+    _enderDeposit()
+    turn()
+    selectEmptySlot()
+  end
+  while getFuelLevel() < 20000 do
+    suck()
+    refuel()
+    if getItemCount(getSelectedSlot()) > 0 then
+      right()
+      drop()
+      left()
+    end
+  end
+  moveToY(oldY, 1)
+  moveToX(oldX, 1)
+  moveToZ(oldZ, 1)
+  depositing = false
+end
+
 function discard()
   compactInventory(1, max)
   for i = 1, max do
@@ -237,7 +269,10 @@ function mine(xSize, zSize, topLevel, botLevel)
   while y > botLevel do
     _mineLevel(xSize, zSize)
     if getFuelLevel() < xSize * zSize * 1.1 then
-      depositAndRefuel()
+      if not enderchest then
+        depositAndRefuel()
+      else
+        refuelWithoutDepositing()
     end
   end
 

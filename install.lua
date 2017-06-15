@@ -8,6 +8,7 @@ programs = {
     "build",
     "setupgps",
     "lumberjack",
+    "trade",
 }
 
 for _, program in ipairs(programs) do

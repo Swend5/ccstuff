@@ -230,7 +230,7 @@ function placeSigns()
   moveLeft()
   moveRight(2)
   turn()
-
+end
 
 function init()
   -- read value file

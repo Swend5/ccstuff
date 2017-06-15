@@ -10,8 +10,8 @@ else
 end
 
 speaker = peripheral.find("speaker")
-sensor = peripheral.wrap("playerSensor")
-chest = peripheral.wrap("chest")
+sensor = peripheral.find("playerSensor")
+chest = peripheral.wrap("back")
 
 if not speaker or not sensor or not chest then
   print("Error finding peripherals")

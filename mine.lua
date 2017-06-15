@@ -1,4 +1,4 @@
--- 1
+-- 2
 args = { ... }
 
 usageString = "Usage: mine [current y] [from level] [to level] [size|xsize zsize]"

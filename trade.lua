@@ -1,4 +1,4 @@
--- 6
+-- 7
 
 if fs.exists("api") then
   shell.run("api")
@@ -18,7 +18,7 @@ if not speaker or not sensor or not chest then
   do return end
 end
 
-knownPlayers = {}
+knownPlayer = {}
 itemValueBuy = {}
 itemValueSell = {}
 itemQty = {}
@@ -28,7 +28,7 @@ interacting = false
 lastName = ""
 direction = ""
 introduction = [[Hello, I am TradeBot. Welcome to my shop. If you need help, please press the button above me.]]
-welcome = [[Welcome back, %d. How may I help you today?]]
+welcome = [[Welcome back, %s. How may I help you today?]]
 goodbye = [[Have a nice day.]]
 helpText = [[To the left and right of me are the values of items to buy or sell. To initiate a transaction, press the button left of me. Then place your payment in my inventory, right click me and write the name of the item you want to buy, followed by the amount. Press the button to the right of me for a printout of the current stock.]]
 
@@ -167,6 +167,7 @@ function transact()
         else
           numDropped = slotQty[i]
           slotQty[i] = 0
+          itemSlots[name][i] = false
           chest.pushItemIntoSlot(direction, i, slot, rest)
           drop()
         end

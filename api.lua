@@ -327,10 +327,11 @@ end
 function selectNonEmptySlot()
   for i = 1, 16 do
     if getItemCount(i) > 0 then
-      return i
+      turtle.select(i)
+      return true
     end
   end
-  return -1
+  return false
 end
 
 function moveToEmptySlot(slot)

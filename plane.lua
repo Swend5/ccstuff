@@ -20,8 +20,8 @@ function placeToX(tx)
     selectNonEmptySlot()
     placeDown()
     if forward() then
-      x = x+dirX
-      z = z+dirZ
+      x = x + dirX
+      z = z + dirZ
     else
       os.sleep(1)
     end
@@ -31,8 +31,8 @@ function placeToX(tx)
     selectNonEmptySlot()
     placeDown()
     if forward() then
-      x = x+dirX
-      z = z+dirZ
+      x = x + dirX
+      z = z + dirZ
     else
       os.sleep(1)
     end
@@ -45,7 +45,7 @@ function placeToZ(tz)
     selectNonEmptySlot()
     placeDown()
     if forward() then
-      x = x +d irX
+      x = x + dirX
       z = z + dirZ
     else
       os.sleep(1)

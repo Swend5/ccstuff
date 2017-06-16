@@ -19,8 +19,8 @@ if not speaker or not sensor or not chest then
 end
 
 knownPlayer = {}
-itemValueBuy = {}
-itemValueSell = {}
+valueBuy = {}
+valueSell = {}
 itemQty = {}
 slotQty = {}
 itemSlots = {}
@@ -33,7 +33,21 @@ goodbye = [[Have a nice day.]]
 helpText = [[To the left and right of me are the values of items to buy or sell. To initiate a transaction, press the button left of me. Then place your payment in my inventory, right click me and write the name of the item you want to buy, followed by the amount. Press the button to the right of me for a printout of the current stock.]]
 
 
+function isSold(item)
+  if type(item) == "string" then
+    return valueSell[item] ~= nil
+  elseif type(item) == "number" then
+    return valueSell[getItemName(item)] ~= nil
+  end
+end
 
+function isBought(item)
+  if type(item) == "string" then
+    return valueBuy[item] ~= nil
+  elseif type(item) == "number" then
+    return valueBuy[getItemName(item)] ~= nil
+  end
+end
 
 function totalStock(name)
   local total = 0
@@ -91,14 +105,16 @@ function transact()
   local name = line_split[1]
   local qty = tonumber(line_split[2])
 
-  if not itemValueSell[name] then
+  if not isSold(name) then
     print("Sorry, I do not sell that item.")
     return false
   end
+
   if qty > totalStock(name) then
     print("Sorry, I do not seem to have enough of that item in stock.")
     return false
   end
+
   local paymentNeeded = itemValue[name] * qty
   
   print(sf("Do you want to buy %d %s, for a total value of %d? [y/n]", qty, name, paymentNeeded))
@@ -107,9 +123,9 @@ function transact()
   if answer == "y" or answer == "yes" or answer == "Y" then
     -- check total value to make sure the transaction is valid
     local totalValue = 0
-    for i = 1, 16 do
-      if itemValueBuy[getItemName(slot)] then
-        local oneValue = itemValueBuy[getItemName(slot)]
+    for slot = 1, 16 do
+      if isBought(slot) then
+        local oneValue = valueBuy[getItemName(slot)]
         totalValue = totalValue + getItemCount(slot) * oneValue
       else
         print(sf("You seem to have placed %s in my inventory, but I do not accept that kind of item as payment.", getItemName(slot)))
@@ -123,12 +139,12 @@ function transact()
     local payment = 0
     local slot = 1
     while payment < paymentNeeded do
-      if itemValueBuy[getItemName(slot)] then
+      if isBought(slot) then
         if slot > 16 then
           print("I am sorry, but I seem to have made a mistake. Please contact my owner and you will be refunded.")
           return false
         end
-        local oneValue = itemValueBuy[getItemName(slot)]
+        local oneValue = valueBuy[getItemName(slot)]
         local slotValue = getItemCount(slot) * oneValue
         if slotValue < paymentNeeded - payment then
           -- current stack is not enough to pay the rest, take whole stack
@@ -182,11 +198,13 @@ function printStock()
   local stock = {}
   for i = 1, chest.getInventorySize() do
     local stack = c.getStackInSlot(i)
-    if stack and itemValueSell[stack.name] then
-      if not stock[stack.name] then
-        stock[name] = stack.qty
+    if stack and isSold(stack.name) then
+      local name = stack.name
+      local qty = stack.qty
+      if not stock[name] then
+        stock[name] = qty
       else
-        stock[name] = stock[name] + stack.qty
+        stock[name] = stock[name] + qty
       end
     end
   end
@@ -199,11 +217,11 @@ function placeSigns()
   local buyLines = {}
   local sellLines = {}
 
-  for k, v in pairs(itemValueBuy) do
+  for k, v in pairs(valueBuy) do
     table.insert(buyLines, k)
     table.insert(buyLines, tostring(v))
   end
-  for k, v in pairs(itemValueSell) do
+  for k, v in pairs(valueSell) do
     table.insert(sellLines, k)
     table.insert(sellLines, tostring(v))
   end
@@ -214,7 +232,7 @@ function placeSigns()
 
   local signsNeeded = math.ceil(#buyLines/4)
   moveUp(signsNeeded + 1)
-  place("BUY VALUE")
+  place("BUYING")
   local curLine = 1
   for i = 1, signsNeeded - 1 do
     moveDown()
@@ -234,7 +252,7 @@ function placeSigns()
 
   local signsNeeded = math.ceil(#sellLines/4)
   moveUp(signsNeeded + 1)
-  place("SELL VALUE")
+  place("SELLING")
   local curLine = 1
   for i = 1, signsNeeded - 1 do
     moveDown()
@@ -261,9 +279,9 @@ function init()
     local name = line_split[2]
     local value = line_split[3]
     if buysell == "buy" then
-      itemValueBuy[name] = tonumber(value)
+      valueBuy[name] = tonumber(value)
     elseif buysell == "sell" then
-      itemValueSell[name] = tonumber(value)
+      valueSell[name] = tonumber(value)
       itemSlots[name] = {}
       itemQty[name] = 0
     end
@@ -281,7 +299,7 @@ function init()
       slotQty[i] = 0
     else
       slotQty[i] = stack.qty
-      if itemValueSell[stack.name] then
+      if isSold(stack.name) then
         itemQty[name] = itemQty[name] + stack.qty
         itemSlots[name][i] = true
       end
@@ -295,7 +313,6 @@ end
 
 init()
 placeSigns()
-help()
 -- while true do
 --   while true do
 --     player = nearbyPlayer(4)

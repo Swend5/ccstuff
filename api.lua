@@ -324,6 +324,15 @@ function selectEmptySlot()
   end
 end
 
+function selectNonEmptySlot()
+  for i = 1, 16 do
+    if getItemCount(i) > 0 then
+      return i
+    end
+  end
+  return -1
+end
+
 function moveToEmptySlot(slot)
   local emptySlot = getEmptySlot()
   if emptySlot == -1 then return false end

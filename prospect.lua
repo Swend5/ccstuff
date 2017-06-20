@@ -50,7 +50,7 @@ while true do
   moveToZ(z + step, 1)
   probe()
   while x >= step do
-    moveToX(x + step, 1)
+    moveToX(x - step, 1)
     probe()
   end
   if z >= zSize - step then break end

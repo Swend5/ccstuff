@@ -23,6 +23,7 @@ function probe()
       selectNonEmptySlot()
       placeDown()
       break
+    end
     if detectDown() then
       digDown()
     end

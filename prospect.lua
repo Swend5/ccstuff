@@ -1,6 +1,8 @@
 -- 1
 args = {...}
 
+usageString = "Usage: prospect blockname y step xSize zSize"
+
 if fs.exists("api") then
   shell.run("api")
 elseif fs.exists("api.lua") then
@@ -38,11 +40,22 @@ function probe()
   moveToY(oldY, 1)
 end
 
-while z < zSize - step do
+while true do
   probe()
   while x < xSize - step do
     moveToX(x + step, 1)
     probe()
   end
+  if z >= zSize - step then break end
+  moveToZ(z + step, 1)
+  probe()
+  while x >= step do
+    moveToX(x + step, 1)
+    probe()
+  end
+  if z >= zSize - step then break end
   moveToZ(z + step, 1)
 end
+
+moveToZ(0, 1)
+moveToX(0, 1)

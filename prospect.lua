@@ -9,11 +9,12 @@ else
   do return end
 end
 
-assert(#args == 3)
+assert(#args == 5)
 blockname = args[1]
-step = tonumber(args[2])
-xSize = tonumber(args[3])
-zSize = tonumber(args[4])
+y = tonumber(args[2])
+step = tonumber(args[3])
+xSize = tonumber(args[4])
+zSize = tonumber(args[5])
 
 function probe()
   local oldY = y

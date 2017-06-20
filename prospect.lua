@@ -19,10 +19,13 @@ function probe()
   local oldY = y
   while y > ty do
     if inspectNameDown() == blockname then
-      moveToY(oldY)
+      moveToY(oldY, 1)
       selectNonEmptySlot()
       placeDown()
       break
+    if detectDown() then
+      digDown()
+    end
     if down() then
       y = y - 1
     else
@@ -34,8 +37,8 @@ end
 while z < zSize - step do
   probe()
   while x < xSize - step do
-    moveToX(x+step)
+    moveToX(x + step, 1)
     probe()
   end
-  moveToZ(z+step)
+  moveToZ(z + step, 1)
 end

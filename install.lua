@@ -3,13 +3,9 @@ programs = {
     "mine",
     "api",
     "refuel",
-    "pmine",
-    "vgps",
-    "build",
-    "setupgps",
-    "lumberjack",
     "trade",
     "plane",
+    "prospect",
 }
 
 for _, program in ipairs(programs) do

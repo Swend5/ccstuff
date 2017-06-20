@@ -1,3 +1,4 @@
+-- 1
 args = {...}
 
 if fs.exists("api") then
@@ -34,6 +35,7 @@ function probe()
       os.sleep(1)
     end
   end
+  moveToY(oldY, 1)
 end
 
 while z < zSize - step do

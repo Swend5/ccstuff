@@ -18,7 +18,7 @@ zSize = tonumber(args[5])
 
 function probe()
   local oldY = y
-  while y > ty do
+  while y > 10 do
     if inspectNameDown() == blockname then
       moveToY(oldY, 1)
       selectNonEmptySlot()

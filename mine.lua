@@ -38,10 +38,11 @@ file.close()
 startY = tonumber(params[1])
 y = tonumber(params[2])
 
-moveToY(startY, 1)
+moveToY(80, 1)
 while detectUp() do
   digUp()
-  moveToY(y+1)
+  os.sleep(1)
+  moveUp()
 end
 
 shell.run("rm", "_mine_info")

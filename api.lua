@@ -399,6 +399,13 @@ function inspectName()
   return splitname[2]
 end
 
+function inspectNameDown()
+  local success, details = inspectDown()
+  if not success then return nil end
+  local splitname = split(details.name, ":")
+  return splitname[2]
+end
+
 function inspectMod()
   local success, details = inspect()
   if not success then return nil end

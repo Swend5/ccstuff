@@ -1,4 +1,4 @@
--- 7
+-- 8
 
 if fs.exists("api") then
   shell.run("api")
@@ -9,43 +9,35 @@ else
   do return end
 end
 
-speaker = peripheral.find("speaker")
-sensor = peripheral.find("playerSensor")
-chest = peripheral.wrap("back")
+chest = peripheral.wrap("right")
+mon = peripheral.find("monitor")
 
-if not speaker or not sensor or not chest then
+if not mon or not chest then
   print("Error finding peripherals")
   do return end
 end
 
-knownPlayer = {}
-valueBuy = {}
-valueSell = {}
+buyValue = {}
+sellValue = {}
 itemQty = {}
 slotQty = {}
 itemSlots = {}
-interacting = false
-lastName = ""
 direction = ""
-introduction = [[Hello, I am TradeBot. Welcome to my shop. If you need help, please press the button above me.]]
-welcome = [[Welcome back, %s. How may I help you today?]]
-goodbye = [[Have a nice day.]]
-helpText = [[To the left and right of me are the values of items to buy or sell. To initiate a transaction, press the button left of me. Then place your payment in my inventory, right click me and write the name of the item you want to buy, followed by the amount. Press the button to the right of me for a printout of the current stock.]]
 
 
 function isSold(item)
   if type(item) == "string" then
-    return valueSell[item] ~= nil
+    return sellValue[item] ~= nil
   elseif type(item) == "number" then
-    return valueSell[getItemName(item)] ~= nil
+    return sellValue[getItemName(item)] ~= nil
   end
 end
 
 function isBought(item)
   if type(item) == "string" then
-    return valueBuy[item] ~= nil
+    return buyValue[item] ~= nil
   elseif type(item) == "number" then
-    return valueBuy[getItemName(item)] ~= nil
+    return buyValue[getItemName(item)] ~= nil
   end
 end
 
@@ -57,46 +49,6 @@ function totalStock(name)
       total = total + stack.qty
     end
   end
-end
-
--- function takeInventory()
---   for i = 1, chest.getInventorySize() do
---     stack = chest.getStackInSlot(i)
---     if stack then
---       slotQty[i] = stack.qty
---       inventory
---       inventory[stack.name] = stack.qty
---   end
--- end
-
-
-function greet(name)
-  if knownPlayer[name] then
-    speaker.speak(string.format(welcome, name), 10)
-  else
-    speaker.speak(introduction, 10)
-  end
-  knownPlayer[name] = true
-  lastName = name
-  interacting = true
-end
-
-function sayGoodbye(name)
-  speaker.speak(goodbye, 10)
-end
-
-function help()
-  speaker.speak(helpText, 10)
-end
-
-function nearbyPlayer(range)
-  players = sensor.getNearbyPlayers()
-  for _, p in pairs(players) do
-    if p.distance < range then
-      return p.name
-    end
-  end
-  return false
 end
 
 function transact()
@@ -111,7 +63,7 @@ function transact()
   end
 
   if qty > totalStock(name) then
-    print("Sorry, I do not seem to have enough of that item in stock.")
+    print("Sorry, I do not seem to have enough of that item in stock. Please refer to the table.")
     return false
   end
 
@@ -125,27 +77,27 @@ function transact()
     local totalValue = 0
     for slot = 1, 16 do
       if isBought(slot) then
-        local oneValue = valueBuy[getItemName(slot)]
+        local oneValue = buyValue[getItemName(slot)]
         totalValue = totalValue + getItemCount(slot) * oneValue
       else
-        print(sf("You seem to have placed %s in my inventory, but I do not accept that kind of item as payment.", getItemName(slot)))
+        print(sf("You seem to have placed %s in my inventory, but I do not accept that kind of item as payment. Please refer to the table.", getItemName(slot)))
       end
     end
     if totalValue < paymentNeeded then
-      print("Only %d of need %d value provided.")
+      print(sf("Only %d of needed %d value provided.", totalValue, paymentNeeded))
       return false
     end
     -- take payment
     local payment = 0
     local slot = 1
     while payment < paymentNeeded do
+      if slot > 16 then
+        print("I am sorry, but I seem to have made a mistake. Please contact my owner and you will be refunded.")
+        return false
+      end
       if isBought(slot) then
-        if slot > 16 then
-          print("I am sorry, but I seem to have made a mistake. Please contact my owner and you will be refunded.")
-          return false
-        end
-        local oneValue = valueBuy[getItemName(slot)]
-        local slotValue = getItemCount(slot) * oneValue
+        local singleValue = buyValue[getItemName(slot)]
+        local slotValue = getItemCount(slot) * singleValue
         if slotValue < paymentNeeded - payment then
           -- current stack is not enough to pay the rest, take whole stack
           payment = payment + slotValue
@@ -154,7 +106,7 @@ function transact()
         else
           -- current stack is enough to pay, take what is needed
           while payment < paymentNeeded do
-            payment = payment + oneValue
+            payment = payment + singleValue
             pullItem(direction, slot, 1)
           end
         end
@@ -213,63 +165,17 @@ function printStock()
   end
 end
 
-function placeSigns()
-  local buyLines = {}
-  local sellLines = {}
+  -- local buyLines = {}
+  -- local sellLines = {}
 
-  for k, v in pairs(valueBuy) do
-    table.insert(buyLines, k)
-    table.insert(buyLines, tostring(v))
-  end
-  for k, v in pairs(valueSell) do
-    table.insert(sellLines, k)
-    table.insert(sellLines, tostring(v))
-  end
-
-  moveForward(2)
-  moveRight()
-  right()
-
-  local signsNeeded = math.ceil(#buyLines/4)
-  moveUp(signsNeeded + 1)
-  place("BUYING")
-  local curLine = 1
-  for i = 1, signsNeeded - 1 do
-    moveDown()
-    place(buyLines[curLine] .. "\n" .. buyLines[curLine+1] .. "\n" .. buyLines[curLine+2] .. "\n" .. buyLines[curLine+3])
-    curLine = curLine + 4
-  end
-  local lastString = ""
-  for i = curLine, #buyLines do
-    lastString = lastString .. "\n" .. buyLines[i]
-  end
-  moveDown()
-  place(lastString)
-
-  moveDown()
-  moveRight(2)
-  left()
-
-  local signsNeeded = math.ceil(#sellLines/4)
-  moveUp(signsNeeded + 1)
-  place("SELLING")
-  local curLine = 1
-  for i = 1, signsNeeded - 1 do
-    moveDown()
-    place(sellLines[curLine] .. "\n" .. sellLines[curLine+1] .. "\n" .. sellLines[curLine+2] .. "\n" .. sellLines[curLine+3])
-    curLine = curLine + 4
-  end
-  local lastString = ""
-  for i = curLine, #sellLines do
-    lastString = lastString .. "\n" .. sellLines[i]
-  end
-  moveDown()
-  place(lastString)
-  moveDown()
-  moveLeft()
-  moveRight(2)
-  turn()
-end
+  -- for k, v in pairs(buyValue) do
+  --   table.insert(buyLines, k)
+  --   table.insert(buyLines, tostring(v))
+  -- end
+  -- for k, v in pairs(sellValue) do
+  --   table.insert(sellLines, k)
+  --   table.insert(sellLines, tostring(v))
+  -- end
 
 function init()
   -- read value file
@@ -279,9 +185,9 @@ function init()
     local name = line_split[2]
     local value = line_split[3]
     if buysell == "buy" then
-      valueBuy[name] = tonumber(value)
+      buyValue[name] = tonumber(value)
     elseif buysell == "sell" then
-      valueSell[name] = tonumber(value)
+      sellValue[name] = tonumber(value)
       itemSlots[name] = {}
       itemQty[name] = 0
     end
@@ -312,23 +218,3 @@ end
 
 
 init()
-placeSigns()
--- while true do
---   while true do
---     player = nearbyPlayer(4)
---     if player and not interacting then
---       greet(player)
---       break
---     elseif not player and interacting then
---       sayGoodbye(player)
---     end
---     if rs.getInput("top") then
---       help()
---     end
---     if rs.getInput("bottom") then
---       transact()
---     end
---     if rs.getInput("back")
---     os.sleep(1)
---   end
--- end
